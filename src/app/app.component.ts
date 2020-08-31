@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { of, from, interval, fromEvent, Observable, Subscription } from 'rxjs';
-import { take, map, tap } from 'rxjs/operators'
+import { of, from, interval, fromEvent, Observable, Subscription, EMPTY, throwError } from 'rxjs';
+import { take, map, tap, catchError } from 'rxjs/operators'
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
 
-    //#region  create observable 
+    //#region create observable 
     let subscription1: Subscription = new Observable(observer => {
       observer.next("Apple 1");
       observer.next("Apple 2");
@@ -52,10 +52,32 @@ export class AppComponent implements OnInit {
         element => console.log(`next: ${element}`),
         err => console.log(err),
         () => console.log("operators completed..."));
+
+    console.log(".................... CatchError ..................");
+    of(2, 4, 6, 8, 10)
+      .pipe(
+        map(item => {
+          if (item === 2)
+            throw new Error("elemet is 2.");
+        }),
+      )
+      .pipe(
+        tap(console.log),                                                           // wil not call cuz no element is emitted 
+        catchError(err => {
+          console.log(`inside the catche error ${err}`);
+          //return EMPTY;                                                           // catch and replace, 
+                                                                                    //  so the complete method will be called, 
+                                                                                    //  but the error method will not
+
+         return throwError("an error is occurred.");                                  // catch and rethrow =>
+                                                                                      // the complete method wil not be called
+                                                                                      // but the error method will                                                                           
+        }),
+      )
+      .subscribe(
+        element => console.log(`next: ${element}`),
+        err => console.log(err),            
+        () => console.log("operators completed..."));
     //#endregion
-
   }
-
-
-
 }
