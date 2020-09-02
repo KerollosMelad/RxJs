@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { of, from, interval, fromEvent, Observable, Subscription, EMPTY, throwError, combineLatest, timer, forkJoin } from 'rxjs';
-import { take, map, tap, catchError, withLatestFrom, delay } from 'rxjs/operators'
+import { take, map, tap, catchError, withLatestFrom, delay, shareReplay } from 'rxjs/operators'
 
 @Component({
   selector: 'app-root',
@@ -131,32 +131,46 @@ export class AppComponent implements OnInit {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    const myPromise = val =>
-      new Promise(resolve => setTimeout(() => resolve(`Promise Resolved: ${val}`), 5000)
-      );
+    // const myPromise = val =>
+    //   new Promise(resolve => setTimeout(() => resolve(`Promise Resolved: ${val}`), 5000)
+    //   );
 
-    /*
-      when all observables complete, give the last
-      emitted value from each as an array
-    */
-    const forkJoinExample = forkJoin(
-      //emit 'Hello' immediately
-      of('Hello'),
-      //emit 'World' after 1 second
-      of('World').pipe(delay(1000)),
-      //emit 0 after 1 second
-      interval(1000).pipe(take(1)),
-      //emit 0...1 in 1 second interval
-      interval(1000).pipe(take(2)),
-      //promise that resolves to 'Promise Resolved' after 5 seconds
-      myPromise('RESULT')
-    );
-    //output: ["Hello", "World", 0, 1, "Promise Resolved: RESULT"]
-    const subscribe = forkJoinExample.subscribe(val => console.log(val));
+    // /*
+    //   when all observables complete, give the last
+    //   emitted value from each as an array
+    // */
+    // const forkJoinExample = forkJoin(
+    //   //emit 'Hello' immediately
+    //   of('Hello'),
+    //   //emit 'World' after 1 second
+    //   of('World').pipe(delay(1000)),
+    //   //emit 0 after 1 second
+    //   interval(1000).pipe(take(1)),
+    //   //emit 0...1 in 1 second interval
+    //   interval(1000).pipe(take(2)),
+    //   //promise that resolves to 'Promise Resolved' after 5 seconds
+    //   myPromise('RESULT')
+    // );
+    // //output: ["Hello", "World", 0, 1, "Promise Resolved: RESULT"]
+    // const subscribe = forkJoinExample.subscribe(val => console.log(val));
 
     //#endregion
 
+    //#region Caching
+    // let a$ = interval(3000)
+    //   .pipe(
+    //     take(4),
+    //     shareReplay(1));
 
+    // a$.subscribe(item => console.log(`first ${item}`));
+    // setTimeout(() => {
+    //   a$.subscribe(item => console.log(`sec ${item}`));
+    // }, 6000); 
 
+    // setTimeout(() => {
+    //   a$.subscribe(item => console.log(`third ${item}`));
+    // }, 9000); 
+
+    //#endregion
   }
 }
